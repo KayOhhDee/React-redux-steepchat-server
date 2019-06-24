@@ -26,7 +26,7 @@ userSchema.pre('save', async function(next){
     if (!this.isModified('password')) {
       return next();
     }
-    let hashedPassword = brcypt.hash(this.password, 10);
+    let hashedPassword = await bcrypt.hash(this.password, 10);
     this.password = hashedPassword;
     return next();
   } catch (err) {
@@ -43,4 +43,4 @@ userSchema.method.comparePassword = async function(inputedPassword, next) {
   }
 }
 
-module.exports = mongoose.Model('User', userSchema)
+module.exports = mongoose.model('User', userSchema)
