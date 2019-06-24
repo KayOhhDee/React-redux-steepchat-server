@@ -21,4 +21,26 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+userSchema.pre('save', async function(next){
+  try {
+    if (!this.isModified('password')) {
+      return next();
+    }
+    let hashedPassword = brcypt.hash(this.password, 10);
+    this.password = hashedPassword;
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+});
+
+userSchema.method.comparePassword = async function(inputedPassword, next) {
+  try {
+    let isMatched = await bcrypt.compare(inputedPassword, this.password);
+    return isMatched;
+  } catch (err) {
+    return next(err);
+  }
+}
+
 module.exports = mongoose.Model('User', userSchema)
