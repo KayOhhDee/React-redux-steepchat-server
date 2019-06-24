@@ -31,5 +31,39 @@ exports.signup = async function(req, res, next) {
   }
 };
 
-exports.signin = function() {}
+exports.signin = async function(req, res, next) {
+  try {
+    let user = await db.User.findOne({
+      email: req.body.email
+    });
+    let { id, username, profileImage } = user;
+    let isMatched = await user.comparePassword(req.body.password);
+    if (isMatched) {
+      let token = jwt.sign(
+        {
+          id,
+          username,
+          profileImage
+        },
+        process.env.SECRET_KEY
+      );
+      return res.status(200).json({
+        id,
+        username,
+        profileImage,
+        token
+      });
+    } else {
+      return next({
+        status: 400,
+        message: "Invalid Email/Password"
+      });
+    }
+  } catch (err) {
+      return next({
+        status: 400,
+        message: "Invalid Email/Password"
+      });
+  }
+}
 
