@@ -7,6 +7,7 @@ const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const messagesRoutes = require('./routes/messages');
 const { loginRequired, isCorrectUser } = require('./middleware/auth');
+const db = require("./models");
 
 const PORT = 8081;
 
@@ -20,6 +21,20 @@ app.use(
   isCorrectUser, 
   messagesRoutes
 );
+
+app.get('/api/messages', loginRequired, async function(req, res, next) {
+  try {
+    let messages = await db.Message.find()
+      .sort({ createdAt: 'desc'})
+      .populate('user', {
+        username: true,
+        profileImage: true
+      })
+    return res.status(200).json(messages);
+  } catch (err) {
+    return next(err);
+  }
+})
 
 app.use(function(req, res, next){
   let err = new Error('Not Found');
