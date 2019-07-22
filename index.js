@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const messagesRoutes = require('./routes/messages');
+const userRoutes = require('./routes/user');
 const { loginRequired, isCorrectUser } = require('./middleware/auth');
 const db = require("./models");
 
@@ -21,6 +22,7 @@ app.use(
   isCorrectUser, 
   messagesRoutes
 );
+app.use("/api/user/:id", loginRequired, isCorrectUser, userRoutes);
 
 app.get('/api/messages', loginRequired, async function(req, res, next) {
   try {
