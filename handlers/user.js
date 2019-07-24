@@ -11,16 +11,17 @@ exports.uploadImage = (req, res, next) => {
   form.keepExtensions = true;
   form.maxFileSize = 5 * 1024 * 1024;
   form.multiples = false;
+  form.headers = req.headers;
 
-  form.parse(req, function(err, fields, file) {
-    let filePath = file[""].path;
+  form.parse(req, function(err, field, file) { 
+    let filePath = file.image.path;
     if (err) {
       res.json({
         message: `Cannot upload image. Error is ${err}`
       });
     }
 
-    if (file[""].type !== "image/png" && file[""].type !== "image/jpeg") {
+    if (file.image.type !== "image/png" && file.image.type !== "image/jpeg") {
       fs.unlinkSync(filePath);
       return res.status(400).json({ error: "invalid file type" });
     }
