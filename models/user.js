@@ -22,7 +22,16 @@ const userSchema = new mongoose.Schema({
   messages: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Message'
-  }]
+  }],
+  bio: {
+    type: String
+  },
+  website: {
+    type: String
+  },
+  location: {
+    type: String
+  }
 });
 
 userSchema.pre('save', async function(next){
