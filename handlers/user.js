@@ -1,6 +1,15 @@
 const db = require("../models");
 const formidable = require("formidable");
 
+exports.getUserInfo = async function(req, res, next) {
+  try {
+    let user = await db.User.findById(req.params.id);
+    const { username, profileImage, id} = user;
+    return res.status(200).json({ id, username, profileImage });
+  } catch (err) {
+    return next(err);
+  }
+}
 
 exports.uploadImage = (req, res, next) => {
   const path = require("path");

@@ -22,7 +22,7 @@ app.use(
   isCorrectUser, 
   messagesRoutes
 );
-app.use("/api/user/:id", loginRequired, isCorrectUser, userRoutes);
+app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 
 app.get('/api/messages', loginRequired, async function(req, res, next) {
   try {
