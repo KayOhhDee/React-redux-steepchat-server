@@ -1,5 +1,6 @@
 const db = require("../models");
 const formidable = require("formidable");
+const { verifyUserInfo } = require("../utils/validators");
 
 exports.getUserInfo = async function(req, res, next) {
   try {
@@ -9,6 +10,19 @@ exports.getUserInfo = async function(req, res, next) {
   } catch (err) {
     return next(err);
   }
+}
+
+exports.addUserInfo = async (req, res, next) => {
+  let userInfo = verifyUserInfo(req.body);
+
+   try {
+    await db.User.findByIdAndUpdate(req.params.id, userInfo, (err, updatedUser)=> {
+      if(err) return res.send(err)
+      return res.status(200).json({message: "Profile info updated successfully"});
+    })     
+   } catch (error) {
+     return next(error);
+   }
 }
 
 exports.uploadImage = (req, res, next) => {
@@ -61,7 +75,7 @@ exports.uploadImage = (req, res, next) => {
             }
             user.profileImage = image.url;
             user.save();
-            return res.status(200).json({ profileImage: user.profileImage });
+            return res.status(200).json({ message: "Image uploaded successfully!"});
           });
         } catch (error) {
           return next({

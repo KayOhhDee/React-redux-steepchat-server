@@ -4,12 +4,13 @@ const jwt = require('jsonwebtoken');
 exports.signup = async function(req, res, next) {
   try {
     let user = await db.User.create(req.body);
-    let {id, username, profileImage} = user;
+    let {id, username, profileImage, createdAt} = user;
     let token = jwt.sign(
       {
         id,
         username,
-        profileImage
+        profileImage,
+        createdAt
       },
       process.env.SECRET_KEY
     );
@@ -17,7 +18,8 @@ exports.signup = async function(req, res, next) {
       id,
       username,
       profileImage,
-      token
+      token, 
+      createdAt
     });
   } catch (err) {
     //if validation fails
@@ -36,14 +38,18 @@ exports.signin = async function(req, res, next) {
     let user = await db.User.findOne({
       email: req.body.email
     });
-    let { id, username, profileImage } = user;
+    let { id, username, profileImage, createdAt, bio, website, location } = user;
     let isMatched = await user.comparePassword(req.body.password);
     if (isMatched) {
       let token = jwt.sign(
         {
           id,
           username,
-          profileImage
+          profileImage,
+          bio,
+          website,
+          location, 
+          createdAt
         },
         process.env.SECRET_KEY
       );
@@ -51,7 +57,11 @@ exports.signin = async function(req, res, next) {
         id,
         username,
         profileImage,
-        token
+        token,
+        bio,
+        website,
+        location,
+        createdAt
       });
     } else {
       return next({
