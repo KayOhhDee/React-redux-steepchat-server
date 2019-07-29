@@ -10,3 +10,4 @@ mongoose.connect("mongodb://localhost/steepchat", {
 module.exports.User = require('./user');
 module.exports.Message = require('./message');
 module.exports.Likes = require('./likes');
+module.exports.Comments = require('./comments');
