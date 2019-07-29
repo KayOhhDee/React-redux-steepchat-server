@@ -5,8 +5,23 @@ const { verifyUserInfo } = require("../utils/validators");
 exports.getUserInfo = async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id);
-    const { username, profileImage, id} = user;
-    return res.status(200).json({ id, username, profileImage });
+    let likesArr = await db.Likes.find();
+    likesArr.map(like => {
+      if(like.user === user._id) {
+        user.likes.push(like)
+      }
+    })
+    const {
+      username,
+      profileImage,
+      id,
+      bio,
+      website,
+      location,
+      likes,
+      createdAt
+    } = user;
+    return res.status(200).json({ id, username, profileImage, bio, website, location, likes, createdAt });
   } catch (err) {
     return next(err);
   }

@@ -19,10 +19,6 @@ const userSchema = new mongoose.Schema({
     profileImage: {
       type: String
     },
-    messages: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Message'
-    }],
     bio: {
       type: String
     },
@@ -31,7 +27,15 @@ const userSchema = new mongoose.Schema({
     },
     location: {
       type: String
-    }
+    },
+    messages: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message'
+    }],
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Likes'
+    }]
   },
   {
     timestamps: true
