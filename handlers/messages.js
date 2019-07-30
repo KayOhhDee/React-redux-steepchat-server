@@ -27,6 +27,10 @@ exports.getMessage = async function(req, res, next) {
         populate: { path: "user", select: "profileImage username" },
         options: {sort: { createdAt: 'desc'}}
       })
+      .populate({
+        path: "user",
+        select: "profileImage username"
+      })
     return res.status(200).json(foundMessage);
   } catch (err) {
     return next(err);
@@ -34,13 +38,13 @@ exports.getMessage = async function(req, res, next) {
 }
 
 exports.deleteMessage = async function(req, res, next) {
- try {
-   let foundMessage = await db.Message.findById(req.params.message_id);
-   await foundMessage.remove();
-   return res.status(200).json(foundMessage);
- } catch (err) {
-   
- }
+  try {
+    let foundMessage = await db.Message.findById(req.params.message_id);
+    await foundMessage.remove();
+    return res.status(200).json(foundMessage);
+  } catch (err) {
+    
+  }
 }
 
 exports.postComment = async function (req, res, next) {
