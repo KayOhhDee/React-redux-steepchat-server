@@ -5,11 +5,16 @@ const {
   createMessage,
   getMessage,
   deleteMessage, 
-  postComment 
+  postComment,
+  likeMessage,
+  unlikeMessage 
 } = require("../handlers/messages");
 
 router.post('/', createMessage);
 router.post('/:message_id/comment', postComment);
+
+router.get('/:message_id/like', likeMessage);
+router.get('/:message_id/unlike', unlikeMessage);
 
 router
   .route('/:message_id')

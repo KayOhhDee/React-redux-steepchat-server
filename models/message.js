@@ -14,7 +14,15 @@ const messageSchema = new mongoose.Schema(
     comments: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Comment'
-    }]
+    }],
+    likeCount: {
+      type: Number,
+      default: 0
+    },
+    commentCount: {
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: true
