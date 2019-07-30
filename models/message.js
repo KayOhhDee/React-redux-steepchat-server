@@ -6,12 +6,15 @@ const messageSchema = new mongoose.Schema(
     text: {
       type: String,
       required: true,
-      maxlength: 170
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"
-    }
+    },
+    comments: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment'
+    }]
   },
   {
     timestamps: true

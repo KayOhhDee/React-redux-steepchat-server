@@ -8,9 +8,10 @@ exports.getUserInfo = async function(req, res, next) {
     let likesArr = await db.Likes.find();
     likesArr.map(like => {
       if(like.user === user._id) {
-        user.likes.push(like)
+        user.likes.push(like.id)
       }
     })
+    await user.save();
     const {
       username,
       profileImage,

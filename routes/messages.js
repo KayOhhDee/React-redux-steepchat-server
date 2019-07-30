@@ -4,10 +4,12 @@ const router = express.Router({ mergeParams: true });
 const { 
   createMessage,
   getMessage,
-  deleteMessage 
+  deleteMessage, 
+  postComment 
 } = require("../handlers/messages");
 
 router.post('/', createMessage);
+router.post('/:message_id/comment', postComment);
 
 router
   .route('/:message_id')
