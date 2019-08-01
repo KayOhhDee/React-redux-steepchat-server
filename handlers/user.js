@@ -5,24 +5,53 @@ const { verifyUserInfo } = require("../utils/validators");
 exports.getUserInfo = async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id);
-    // let likesArr = await db.Likes.find();
-    // likesArr.map(like => {
-    //   if(like.user === user._id) {
-    //     user.likes.push(like.id)
-    //   }
-    // })
+
+    let likesArr = await db.Likes.find({user: user._id});
+    likesArr.map(like => {
+      if(!user.likes.includes(like._id)){
+        user.likes.push(like._id);
+      }
+    })
     await user.save();
-    const {
-      username,
-      profileImage,
-      id,
-      bio,
-      website,
-      location,
-      likes,
-      createdAt
-    } = user;
-    return res.status(200).json({ id, username, profileImage, bio, website, location, likes, createdAt });
+    
+    let notificationArr = await db.Notification.find({ recipient: user._id })
+    notificationArr.map(notification => {
+      if(!user.notifications.includes(notification._id)) {
+        user.notifications.push(notification._id);
+      }
+    })
+    await user.save();
+
+    let foundUser = await db.User.findById(req.params.id)
+      .populate({path: "likes"})
+      .populate({path: "notifications", options: {sort: { createdAt: 'desc'}}})
+      
+  
+    return res.status(200).json(foundUser)
+
+    // const {
+    //   username,
+    //   profileImage,
+    //   id,
+    //   bio,
+    //   website,
+    //   location,
+    //   likes,
+    //   notifications,
+    //   createdAt
+    // } = user;
+
+    // return res.status(200).json({ 
+    //   id, 
+    //   username, 
+    //   profileImage, 
+    //   bio, 
+    //   website, 
+    //   location, 
+    //   likes,
+    //   notifications, 
+    //   createdAt 
+    // });
   } catch (err) {
     return next(err);
   }

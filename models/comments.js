@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const Notification = require("./notifications");
+const Message = require("./message");
 
 const commentSchema = new mongoose.Schema(
   {
@@ -19,5 +21,19 @@ const commentSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+commentSchema.post('save', async function(next) {
+  try {
+    let message = await Message.findById(this.message);
+    await Notification.create({
+      recipient: message.user,
+      sender: this.user,
+      message: this.message,
+      type: "comment"
+    });
+  } catch (error) {
+    next(error)
+  }
+})
 
 module.exports = mongoose.model("Comment", commentSchema);

@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
     },
     password: {
       type: String,
-      required: true
+      required: true,
+      select: false
     },
     profileImage: {
       type: String
@@ -35,6 +36,10 @@ const userSchema = new mongoose.Schema({
     likes: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Likes'
+    }],
+    notifications: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Notification'
     }]
   },
   {
