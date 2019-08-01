@@ -24,6 +24,20 @@ app.use(
 );
 app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 
+app.get('/api/users/:id', async function(req, res, next) {
+  try {
+    let user = await db.User.findById(req.params.id).populate({
+      path: "messages",
+      options: { sort: { createdAt: "desc" } },
+      populate: { path: "user", select: "profileImage username" }
+    });
+
+    return res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.get('/api/messages', loginRequired, async function(req, res, next) {
   try {
     let messages = await db.Message.find()

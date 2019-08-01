@@ -17,12 +17,14 @@ const likesSchema = new mongoose.Schema({
 likesSchema.post('save', async function(next) {
   try {
     let message = await Message.findById(this.message)
-    await Notification.create({
-      recipient: message.user,
-      sender: this.user,
-      message: this.message,
-      type: "like"
-    })
+    if(message.user !== this.user) {
+      await Notification.create({
+        recipient: message.user,
+        sender: this.user,
+        message: this.message,
+        type: "like"
+      });
+    }
   } catch (error) {
     next(error)
   }

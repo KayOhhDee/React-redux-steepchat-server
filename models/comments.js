@@ -25,12 +25,14 @@ const commentSchema = new mongoose.Schema(
 commentSchema.post('save', async function(next) {
   try {
     let message = await Message.findById(this.message);
-    await Notification.create({
-      recipient: message.user,
-      sender: this.user,
-      message: this.message,
-      type: "comment"
-    });
+    if(message.user !== this.user) {
+      await Notification.create({
+        recipient: message.user,
+        sender: this.user,
+        message: this.message,
+        type: "comment"
+      });
+    }
   } catch (error) {
     next(error)
   }

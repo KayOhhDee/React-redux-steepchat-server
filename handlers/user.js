@@ -25,33 +25,9 @@ exports.getUserInfo = async function(req, res, next) {
     let foundUser = await db.User.findById(req.params.id)
       .populate({path: "likes"})
       .populate({path: "notifications", options: {sort: { createdAt: 'desc'}}})
+      .limit(10)
       
-  
     return res.status(200).json(foundUser)
-
-    // const {
-    //   username,
-    //   profileImage,
-    //   id,
-    //   bio,
-    //   website,
-    //   location,
-    //   likes,
-    //   notifications,
-    //   createdAt
-    // } = user;
-
-    // return res.status(200).json({ 
-    //   id, 
-    //   username, 
-    //   profileImage, 
-    //   bio, 
-    //   website, 
-    //   location, 
-    //   likes,
-    //   notifications, 
-    //   createdAt 
-    // });
   } catch (err) {
     return next(err);
   }
@@ -68,6 +44,20 @@ exports.addUserInfo = async (req, res, next) => {
    } catch (error) {
      return next(error);
    }
+}
+
+exports.readNotifications = async function(req, res, next) {
+  try {
+    await db.Notification.update(
+      { _id: { $in: req.body } },
+      { $set: { read: true } },
+      { multi: true }
+    );
+
+    return res.status(200).json({message: "Notifications read"})
+  } catch (error) {
+    next(error)
+  }
 }
 
 exports.uploadImage = (req, res, next) => {
