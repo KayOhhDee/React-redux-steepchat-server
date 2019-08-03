@@ -5,46 +5,70 @@ const { verifyUserInfo } = require("../utils/validators");
 exports.getUserInfo = async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id);
+    let notificationArr = await db.Notification.find({ recipient: user._id }, '_id');
+    let likesArr = await db.Likes.find({ user: user._id }, '_id');
+    let newNotificationIds = [];
+    let newLikesIds = [];
 
-    let likesArr = await db.Likes.find({user: user._id});
+    notificationArr.map(n => newNotificationIds.push(n._id.toString()));
+    likesArr.map(l => newLikesIds.push(l._id.toString()));
+
+    let unusedLikes = user.likes.filter(like => !newLikesIds.includes(like.toString()));
+    let unusedNotifications = user.notifications.filter(
+      notification => !newNotificationIds.includes(notification.toString())
+    );
+
+    await db.User.update(
+      {},
+      { $pull: { likes: { $in: unusedLikes }, notifications: { $in: unusedNotifications } } },
+      { multi: true }
+    );
+
     likesArr.map(like => {
-      if(!user.likes.includes(like._id)){
+      if (!user.likes.includes(like._id)) {
         user.likes.push(like._id);
       }
-    })
-    await user.save();
-    
-    let notificationArr = await db.Notification.find({ recipient: user._id })
+    });
     notificationArr.map(notification => {
-      if(!user.notifications.includes(notification._id)) {
+      if (!user.notifications.includes(notification._id)) {
         user.notifications.push(notification._id);
       }
-    })
+    });
+
     await user.save();
 
     let foundUser = await db.User.findById(req.params.id)
-      .populate({path: "likes"})
-      .populate({path: "notifications", options: {sort: { createdAt: 'desc'}}})
-      .limit(10)
-      
-    return res.status(200).json(foundUser)
+      .populate({ path: "likes" })
+      .populate({
+        path: "notifications",
+        options: { sort: { createdAt: "desc" } }
+      })
+      .limit(10);
+
+    return res.status(200).json(foundUser);
   } catch (err) {
     return next(err);
   }
-}
+};
 
 exports.addUserInfo = async (req, res, next) => {
   let userInfo = verifyUserInfo(req.body);
 
-   try {
-    await db.User.findByIdAndUpdate(req.params.id, userInfo, (err, updatedUser)=> {
-      if(err) return res.send(err)
-      return res.status(200).json({message: "Profile info updated successfully"});
-    })     
-   } catch (error) {
-     return next(error);
-   }
-}
+  try {
+    await db.User.findByIdAndUpdate(
+      req.params.id,
+      userInfo,
+      (err, updatedUser) => {
+        if (err) return res.send(err);
+        return res
+          .status(200)
+          .json({ message: "Profile info updated successfully" });
+      }
+    );
+  } catch (error) {
+    return next(error);
+  }
+};
 
 exports.readNotifications = async function(req, res, next) {
   try {
@@ -54,11 +78,11 @@ exports.readNotifications = async function(req, res, next) {
       { multi: true }
     );
 
-    return res.status(200).json({message: "Notifications read"})
+    return res.status(200).json({ message: "Notifications read" });
   } catch (error) {
-    next(error)
+    return next(error);
   }
-}
+};
 
 exports.uploadImage = (req, res, next) => {
   const path = require("path");
@@ -71,7 +95,7 @@ exports.uploadImage = (req, res, next) => {
   form.multiples = false;
   form.headers = req.headers;
 
-  form.parse(req, function(err, field, file) { 
+  form.parse(req, function(err, field, file) {
     let filePath = file.image.path;
     if (err) {
       res.json({
@@ -110,7 +134,9 @@ exports.uploadImage = (req, res, next) => {
             }
             user.profileImage = image.url;
             user.save();
-            return res.status(200).json({ message: "Image uploaded successfully!"});
+            return res
+              .status(200)
+              .json({ message: "Image uploaded successfully!" });
           });
         } catch (error) {
           return next({

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('./user');
+const db = require("./index");
 
 const messageSchema = new mongoose.Schema(
   {
@@ -31,9 +31,15 @@ const messageSchema = new mongoose.Schema(
 
 messageSchema.pre('remove', async function(next) {
   try {
-    let user = await User.findById(this.user)
-    user.messages.remove(this.id);
+    let user = await db.User.findById(this.user);
+  
+    await user.messages.remove(this.id);
     await user.save();
+
+    await db.Notification.find({message: this.id}).deleteMany();
+    await db.Likes.find({message: this.id}).deleteMany();
+    await db.Comment.find({ message: this.id }).deleteMany();
+
     return next();
   } catch (err) {
     return next(err);

@@ -43,7 +43,7 @@ exports.deleteMessage = async function(req, res, next) {
     await foundMessage.remove();
     return res.status(200).json(foundMessage);
   } catch (err) {
-    next(err)
+    return next(err)
   }
 }
 
@@ -69,7 +69,7 @@ exports.postComment = async function (req, res, next) {
       })
     return res.status(200).json(foundComment);
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -93,7 +93,7 @@ exports.likeMessage = async function(req, res, next) {
     }
       
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 
@@ -115,7 +115,7 @@ exports.unlikeMessage = async function(req, res, next) {
     }
       
   } catch (error) {
-    next(error)
+    return next(error)
   }
 }
 

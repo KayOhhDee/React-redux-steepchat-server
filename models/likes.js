@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const Notification = require("./notifications");
-const Message = require("./message");
-const User = require("./user");
+const db = require("./index");
 
 const likesSchema = new mongoose.Schema({
   user: {
@@ -14,11 +12,11 @@ const likesSchema = new mongoose.Schema({
   }
 });
 
-likesSchema.post('save', async function(next) {
+likesSchema.post('save', async function(doc, next) {
   try {
-    let message = await Message.findById(this.message)
-    if(message.user !== this.user) {
-      await Notification.create({
+    let message = await db.Message.findById(this.message)
+    if(message.user.toString() !== this.user.toString()) {
+      await db.Notification.create({
         recipient: message.user,
         sender: this.user,
         message: this.message,
@@ -32,20 +30,23 @@ likesSchema.post('save', async function(next) {
 
 likesSchema.pre('remove', async function(next) {
   try {
-    let user = await User.findById(this.user);
-    let notification = await Notification.find({
-      sender: this.user,
-      message: this.message,
-      type: "like"
-    })
-    notification[0].remove();
+    let message = await db.Message.findById(this.message);
+    let user = await db.User.findById(this.user);
 
-    user.likes.remove(this.id);
+    if(message.user.toString() !== this.user.toString()) {
+      let notification = await db.Notification.find({
+        sender: this.user,
+        message: this.message,
+        type: "like"
+      })
+      await notification[0].remove();
+    }
+
+    await user.likes.remove(this.id);
     await user.save();
-    
     return next();
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 

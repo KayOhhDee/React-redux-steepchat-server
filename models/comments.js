@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const Notification = require("./notifications");
-const Message = require("./message");
+const db = require("./index")
 
 const commentSchema = new mongoose.Schema(
   {
@@ -22,11 +21,11 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-commentSchema.post('save', async function(next) {
+commentSchema.post('save', async function(doc, next) {
   try {
-    let message = await Message.findById(this.message);
-    if(message.user !== this.user) {
-      await Notification.create({
+    let message = await db.Message.findById(this.message);
+    if(message.user.toString() !== this.user.toString()) {
+      await db.Notification.create({
         recipient: message.user,
         sender: this.user,
         message: this.message,
@@ -34,7 +33,7 @@ commentSchema.post('save', async function(next) {
       });
     }
   } catch (error) {
-    next(error)
+    return next(error)
   }
 })
 
