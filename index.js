@@ -26,7 +26,7 @@ app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 
 app.get('/api/users/:id', async function(req, res, next) {
   try {
-    let user = await db.User.findById(req.params.id).populate({
+    let user = await db.User.findById(req.params.id, "-password").populate({
       path: "messages",
       options: { sort: { createdAt: "desc" } },
       populate: { path: "user", select: "profileImage username" }

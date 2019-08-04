@@ -37,7 +37,7 @@ exports.getUserInfo = async function(req, res, next) {
 
     await user.save();
 
-    let foundUser = await db.User.findById(req.params.id)
+    let foundUser = await db.User.findById(req.params.id, '-password')
       .populate({ path: "likes" })
       .populate({
         path: "notifications",
