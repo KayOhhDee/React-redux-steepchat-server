@@ -24,7 +24,7 @@ app.use(
 );
 app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 
-app.get('/api/users/:id', async function(req, res, next) {
+app.get('/api/users/:id', loginRequired, async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id, "-password").populate({
       path: "messages",

@@ -86,7 +86,14 @@ exports.likeMessage = async function(req, res, next) {
         message: req.params.message_id
       })
 
-      let foundMessage = await db.Message.findByIdAndUpdate(req.params.message_id, { $inc: { likeCount: 1 } })
+      let foundMessage = await db.Message.findByIdAndUpdate(
+        req.params.message_id,
+        { $inc: { likeCount: 1 } },
+        { new: true }
+      ).populate("user", {
+        username: true,
+        profileImage: true
+      });
       return res.status(200).json(foundMessage);
     } else {
       return res.status(400).json({error: {message: 'Post already liked'}})
@@ -110,7 +117,14 @@ exports.unlikeMessage = async function(req, res, next) {
       let foundLike = await db.Likes.findById(likeDocument[0]._id);
       await foundLike.remove();
 
-      let foundMessage = await db.Message.findByIdAndUpdate(req.params.message_id, { $inc: { likeCount: -1 } })
+      let foundMessage = await db.Message.findByIdAndUpdate(
+        req.params.message_id,
+        { $inc: { likeCount: -1 } },
+        { new: true }
+      ).populate("user", {
+        username: true,
+        profileImage: true
+      });
       return res.status(200).json(foundMessage);
     }
       
