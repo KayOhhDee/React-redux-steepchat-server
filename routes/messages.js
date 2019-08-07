@@ -16,9 +16,7 @@ router.post('/:message_id/comment', postComment);
 router.get('/:message_id/like', likeMessage);
 router.get('/:message_id/unlike', unlikeMessage);
 
-router
-  .route('/:message_id')
-  .get(getMessage)
-  .delete(deleteMessage);
+router.delete('/:message_id', deleteMessage)
+
 
 module.exports = router;

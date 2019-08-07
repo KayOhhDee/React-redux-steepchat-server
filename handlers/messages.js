@@ -19,24 +19,6 @@ exports.createMessage = async function(req, res, next) {
   }
 }
 
-exports.getMessage = async function(req, res, next) {
-  try {
-    let foundMessage = await db.Message.findById(req.params.message_id)
-      .populate({
-        path: "comments",
-        populate: { path: "user", select: "profileImage username" },
-        options: {sort: { createdAt: 'desc'}}
-      })
-      .populate({
-        path: "user",
-        select: "profileImage username"
-      })
-    return res.status(200).json(foundMessage);
-  } catch (err) {
-    return next(err);
-  }
-}
-
 exports.deleteMessage = async function(req, res, next) {
   try {
     let foundMessage = await db.Message.findById(req.params.message_id);

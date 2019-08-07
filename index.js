@@ -16,14 +16,40 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
-app.use(
-  '/api/users/:id/messages', 
-  loginRequired, 
-  isCorrectUser, 
-  messagesRoutes
-);
-app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 
+app.use('/api/users/:id/messages', loginRequired, isCorrectUser, messagesRoutes);
+app.get('/api/user/:id/messages/:message_id', loginRequired,  async function(req, res, next) {
+  try {
+    let foundMessage = await db.Message.findById(req.params.message_id)
+      .populate({
+        path: "comments",
+        populate: { path: "user", select: "profileImage username" },
+        options: {sort: { createdAt: 'desc'}}
+      })
+      .populate({
+        path: "user",
+        select: "profileImage username"
+      })
+    return res.status(200).json(foundMessage);
+  } catch (err) {
+    return next(err);
+  }
+});
+app.get("/api/messages", loginRequired, async function(req, res, next) {
+  try {
+    let messages = await db.Message.find()
+      .sort({ createdAt: "desc" })
+      .populate("user", {
+        username: true,
+        profileImage: true
+      });
+    return res.status(200).json(messages);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.use('/api/user/:id', loginRequired, isCorrectUser, userRoutes);
 app.get('/api/users/:id', loginRequired, async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id, "-password").populate({
@@ -37,20 +63,6 @@ app.get('/api/users/:id', loginRequired, async function(req, res, next) {
     next(error);
   }
 });
-
-app.get('/api/messages', loginRequired, async function(req, res, next) {
-  try {
-    let messages = await db.Message.find()
-      .sort({ createdAt: 'desc'})
-      .populate('user', {
-        username: true,
-        profileImage: true
-      })
-    return res.status(200).json(messages);
-  } catch (err) {
-    return next(err);
-  }
-})
 
 app.use(function(req, res, next){
   let err = new Error('Not Found');
