@@ -72,10 +72,16 @@ exports.likeMessage = async function(req, res, next) {
         req.params.message_id,
         { $inc: { likeCount: 1 } },
         { new: true }
-      ).populate("user", {
-        username: true,
-        profileImage: true
-      });
+      )
+        .populate({
+          path: "comments",
+          populate: { path: "user", select: "profileImage username" },
+          options: { sort: { createdAt: "desc" } }
+        })
+        .populate({
+          path: "user",
+          select: "profileImage username"
+        });
       return res.status(200).json(foundMessage);
     } else {
       return res.status(400).json({error: {message: 'Post already liked'}})
@@ -103,10 +109,17 @@ exports.unlikeMessage = async function(req, res, next) {
         req.params.message_id,
         { $inc: { likeCount: -1 } },
         { new: true }
-      ).populate("user", {
-        username: true,
-        profileImage: true
-      });
+      )
+        .populate({
+          path: "comments",
+          populate: { path: "user", select: "profileImage username" },
+          options: { sort: { createdAt: "desc" } }
+        })
+        .populate({
+          path: "user",
+          select: "profileImage username"
+        });
+
       return res.status(200).json(foundMessage);
     }
       
