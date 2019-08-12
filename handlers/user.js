@@ -41,6 +41,7 @@ exports.getUserInfo = async function(req, res, next) {
       .populate({ path: "likes" })
       .populate({
         path: "notifications",
+        populate: {path: "sender", select: "_id username"},
         options: { sort: { createdAt: "desc" } }
       })
       .limit(10);
