@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 
 app.use('/api/users/:id/messages', loginRequired, isCorrectUser, messagesRoutes);
-app.get('/api/user/:id/messages/:message_id', loginRequired,  async function(req, res, next) {
+app.get('/api/user/:id/messages/:message_id',  async function(req, res, next) {
   try {
     let foundMessage = await db.Message.findById(req.params.message_id)
       .populate({
@@ -42,7 +42,7 @@ app.get("/api/messages", loginRequired, async function(req, res, next) {
       .populate("user", {
         username: true,
         profileImage: true
-      });
+      })
     return res.status(200).json(messages);
   } catch (err) {
     return next(err);
