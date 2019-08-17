@@ -1,5 +1,5 @@
 {
-  "name": "my-mongodb-api",
+  "name": "steepchat-api",
   "version": 2,
   "env": {
     "MONGODB_URI": "@my-mongodb-uri",
@@ -7,5 +7,6 @@
     "CLOUD_NAME" : "@my-cloud-name",
     "API_KEY"    : "@my-api-key",
     "API_SECRET" : "@my-api-secret"
-  }
+  },
+  "builds": [{ "src": "index.js", "use": "@now/node" }]
 }
