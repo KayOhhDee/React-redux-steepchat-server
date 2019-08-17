@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.set('debug', true);
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/steepchat", {
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/steepchat", {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false
