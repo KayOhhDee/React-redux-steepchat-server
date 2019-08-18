@@ -133,7 +133,7 @@ exports.uploadImage = (req, res, next) => {
                 message: "You cannot perform this action"
               });
             }
-            user.profileImage = image.url;
+            user.profileImage = image.secure_url;
             user.save();
             return res
               .status(200)
